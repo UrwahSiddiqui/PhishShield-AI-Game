@@ -1,0 +1,18 @@
+# Python legacy artifacts
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+
+# Web dependencies and build output
+web/node_modules/
+web/dist/
+web/.vite/
+
+# Local environment and editor files
+.env
+.env.*
+!.env.example
+.vscode/settings.json
+*.log
