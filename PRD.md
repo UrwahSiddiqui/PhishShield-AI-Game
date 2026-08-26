@@ -190,6 +190,39 @@ These are product acceptance targets, not claims about social impact:
 - README includes screenshots or a GIF, a live demo link when deployed, setup, tests, limitations, and verified before/after evidence.
 - Any personal challenge, result, metric, or lesson attributed to Urwah is marked `TODO — confirm with Urwah` until confirmed.
 
+## Approved Simulation Redesign
+
+The first web experience is one complete, replayable corporate phishing campaign, not a flat sequence of standalone quiz cards. The player is a cyber defender on duty for fictional Northstar Systems while a coordinated campaign targets employees, executives, finance staff, and IT administrators. The connection is a game-design structure, not a claim of real-world threat attribution.
+
+### Core gameplay loop
+
+1. Show a campaign briefing.
+2. Add an incident to the defender queue.
+3. Let the player inspect the communication and evidence.
+4. Offer a small, context-relevant set of defensive responses while the response window runs.
+5. Resolve classification and operational action together, allowing partial correctness where appropriate.
+6. Apply deterministic company-health and campaign-threat consequences.
+7. Show a concise incident report with the operational outcome and learning rationale.
+8. Escalate through 4-6 connected incidents toward one materially different boss incident.
+9. Show a campaign result when the boss is contained, the campaign is breached, or all incidents are resolved.
+
+### Company health and threat rules
+
+- Company health starts at 100, is clamped to 0-100, and represents accumulated operational damage.
+- Threat is a separate 0-100 campaign momentum score. It represents how close the active campaign is to escalating or succeeding.
+- Threat states are Low (0-19), Guarded (20-39), Elevated (40-59), High (60-79), and Critical (80-100).
+- Health can decrease after trusting a phishing incident, allowing a dangerous attachment, exposing credentials, blocking a legitimate message, or mishandling a boss incident.
+- Threat can increase when strong evidence is missed, an incident expires, an attack stage succeeds, or later stages are reached. It can decrease when an attack is contained or verified through a trusted channel.
+- Initial centralized impact hypotheses are low 5, medium 10, high 20, and a balanced critical boss consequence. These values require playtesting, not evidence claims.
+
+### Timers, actions, and end states
+
+Each incident has a data-driven response window. Timers pause when the browser tab is hidden and while debrief or blocking dialogs are open. Expiry resolves once through a deterministic timeout rule. An untimed accessibility/training mode removes timeout failure without penalizing the player. Warnings use text and status announcements, never flashing or colour alone.
+
+Context-relevant actions may include Allow, Quarantine, Report phishing, Verify through a trusted channel, Block sender/domain, and Escalate to security. The game presents only actions appropriate to the incident. Inspection is free and never damages health or threat.
+
+The campaign is won when the final attack is contained, health remains above zero, and threat is below the breach threshold. It is lost when health reaches zero, threat reaches the breach threshold, or a critical boss failure triggers breach. Minor mistakes must allow recovery.
+
 ## Verification Status
 
 - **Verified legacy facts:** fixed-size Pygame entry point, duplicate/inconsistent controllers, missing imports, unused-looking dependencies/assets, random attack behavior, sparse education content, tracked generated files, and no meaningful automated tests.

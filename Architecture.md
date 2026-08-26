@@ -165,3 +165,28 @@ Build a static asset bundle and deploy it to GitHub Pages after the local MVP is
 - **Approved rebuild decisions:** static client-side Vite/React/TypeScript app; GitHub Pages target; local-only progress; no authentication, database, backend, paid API, cloud AI, or runtime Ollama dependency; legacy Python/Pygame preserved as historical evidence; deterministic adaptation described without AI language.
 - **Future possibilities:** local Ollama-assisted draft authoring, PWA support, trainer export, localization, and optional privacy-reviewed aggregate research. None is part of the MVP.
 - **Still requiring confirmation:** Urwah's personal challenges, solutions, learning, and portfolio outcomes; these remain marked `TODO — confirm with Urwah` until supplied.
+
+## Campaign Simulation Boundary
+
+The approved simulation engine sits between React and scenario content. React owns presentation and timer orchestration; pure domain functions own campaign initialization, response resolution, health and threat changes, timeout consequences, stage advancement, boss unlock, summary statistics, and win/loss evaluation.
+
+The campaign state includes `campaignId`, `currentIncidentIndex`, `resolvedIncidentIds`, `companyHealth`, `threatScore`, `threatState`, `incidentStatus`, `remainingTime`, `containmentStreak`, `campaignOutcome`, `playerResponses`, and `mode`. A response records incident ID, classification, operational action, selected evidence IDs, result, and timestamp. Derived values should not be duplicated in React state.
+
+Rules:
+
+- Health and threat are clamped at 0-100 and all tuning constants live in the domain layer.
+- Incident resolution is idempotent; an incident ID can resolve once, and timeout cannot also resolve through a click.
+- Strong evidence is an observable fact, not a conclusion announced before the response.
+- Defensive actions are scenario-specific and may be partially correct.
+- Boss incidents combine previously taught techniques, refer to earlier campaign events, and remain solvable through evidence rather than obscure knowledge or real-time typing.
+- A stable campaign definition and seed produce a deterministic replay. Ordering must never change scoring or evidence.
+
+## New Component Responsibilities
+
+- `CampaignBriefing`: establishes the defender role, fictional company, campaign objective, and timed/untimed mode.
+- `OperationsWorkspace`: composes command bar, incident queue, message investigation, evidence, and response controls.
+- `CommandBar`: presents company health, threat state, campaign stage, and timer with accessible text labels.
+- `IncidentQueue`: presents queued, active, contained, missed, escalated, and boss statuses.
+- `IncidentReport`: explains operational outcome, health delta, threat delta, evidence, and learning takeaway.
+- `campaignEngine`: pure campaign state transitions and summary functions.
+- `timerController`: hidden-tab pause, debrief pause, timeout dispatch, and untimed behavior without direct state mutation.

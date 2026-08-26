@@ -30,49 +30,63 @@ Phases are sequential. Do not start the next phase until the current phase's exi
 
 **Dependencies/risks:** GitHub Pages base-path configuration affects deployment. Typography or media assets may affect performance.
 
-## Phase 2: Content Schema and Curated Dataset
+## Phase 2: Campaign Engine and Simulation Rules
 
-**Goal:** Establish safe, reviewable scenario content before building complex play behavior.
+**Goal:** Replace the flat quiz loop with a pure, testable corporate campaign engine before expanding scenario content.
 
-**Tasks:** Define typed models and runtime schema; create authoring checklist; write and review at least 20 scenarios across email, SMS, QR, login-page, and social-engineering types; include evidence, answer, red flags, rationale, and difficulty.
+**Tasks:** Define campaign state and incident-response models; centralize company health, threat score/state, impact values, timer outcomes, stage progression, boss unlock, win/loss, summary, and idempotent resolution. Extend the scenario schema only where the first connected campaign needs it.
 
-**Deliverables:** Versioned JSON dataset, schema validator, content tests, review notes.
+**Deliverables:** Campaign engine, typed incident-response model, initial campaign definition, engine tests, and updated rules documentation.
+
+**Tests:** Health/threat boundaries, threat-state mapping, correct containment, incorrect allow, false-positive blocking, timeout once, advancement, boss unlock, win/loss, recovery, deterministic replay, duplicate resolution, untimed mode, and existing scenario tests.
+
+**Exit criteria:** A deterministic fixture campaign can progress through incidents, produce visible health/threat consequences, unlock a boss, and reach both win and loss outcomes in tests. No UI timer or scenario expansion is required for this exit criterion.
+
+**Dependencies/risks:** Poor tuning can make one mistake fatal or make the meters decorative. Keep values centralized and test recovery paths.
+
+## Phase 3: Content Schema and Connected Campaign
+
+**Goal:** Establish safe, reviewable content for one connected campaign without broad expansion to 20 standalone scenarios.
+
+**Tasks:** Extend typed models and runtime schema with campaign stage, impact, response window, available actions, operational outcomes, and boss metadata where needed. Reorder/adapt the existing six scenarios into 4-6 connected incidents and add only the minimum new content for one coherent boss.
+
+**Deliverables:** Versioned campaign JSON, schema validator, content tests, authoring checklist, and campaign review notes.
 
 **Tests:** Schema validation, unique IDs, supported types/categories, exactly one correct action, evidence-to-rationale coverage, inert URL/QR checks.
 
-**Exit criteria:** All scenarios pass validation and content review; no scenario contains real credential collection or an actionable harmful payload.
+**Exit criteria:** The complete first campaign passes validation and content review; its connection is clearly fictional; no scenario contains real credential collection or an actionable harmful payload. Expansion to 20 scenarios remains deferred until manual gameplay review.
 
 **Dependencies/risks:** Educational quality needs subject-matter review. Do not claim expert review until confirmed.
 
-## Phase 3: Core Decision Loop
+## Phase 4: Operations Workspace and Core Decision Loop
 
-**Goal:** Implement the scenario experience and learning feedback.
+**Goal:** Implement the cyber-defence workspace around the campaign engine.
 
-**Tasks:** Build scenario renderer, evidence inspection, Trust/Report/Inspect-style actions, immediate debrief, hint behavior, and progress state. Keep scoring pure and deterministic.
+**Tasks:** Build campaign briefing, company health and threat displays, incident queue/timeline, scenario renderer, evidence inspection, context-relevant defensive actions, operational incident report, and campaign progression. Keep resolution pure and deterministic.
 
-**Deliverables:** Playable scenario flow from start through feedback.
+**Deliverables:** Playable campaign flow from briefing through incident reports and boss entry.
 
-**Tests:** Domain rules, duplicate submission, keyboard inspection, feedback completeness, component behavior, one end-to-end journey.
+**Tests:** Domain rules, duplicate submission, keyboard inspection, feedback completeness, health/threat announcements, component behavior, one end-to-end campaign journey.
 
 **Exit criteria:** A learner can complete scenarios with keyboard or touch, every answer receives a rationale, and no essential evidence depends on hover or colour.
 
 **Dependencies/risks:** Content and UI language may expose ambiguity in action labels. Resolve through usability checks.
 
-## Phase 4: Progression, Adaptation, and Persistence
+## Phase 5: Timers, Progression, Adaptation, and Persistence
 
-**Goal:** Make practice responsive to mistakes while preserving transparent, local-only state.
+**Goal:** Add timed incidents and persistent campaign practice while preserving transparent, local-only state.
 
-**Tasks:** Add difficulty progression, score/streak/accuracy/category metrics, deterministic adaptive selection, versioned localStorage, corruption recovery, resume, and reset.
+**Tasks:** Add data-driven timers, hidden-tab pause, feedback pause, timeout consequences, untimed mode, difficulty progression, score/streak/accuracy/category metrics, deterministic adaptive selection, versioned localStorage, corruption recovery, resume, replay, and reset.
 
-**Deliverables:** Full session model, adaptive engine, summary screen, persistence adapter.
+**Deliverables:** Full campaign model, timer boundary, adaptive engine, campaign summary, persistence adapter.
 
-**Tests:** Boundary scoring, streak resets, category aggregation, deterministic selector fixtures, malformed storage, migration/version handling, reset confirmation, Playwright resume and summary journeys.
+**Tests:** Timer boundary and pause/resume, timeout once, untimed mode, boundary scoring, streak resets, category aggregation, deterministic selector fixtures, malformed storage, migration/version handling, reset confirmation, Playwright replay and summary journeys.
 
 **Exit criteria:** Metrics are reproducible, weak categories receive bounded extra practice, corrupted state cannot break the app, and UI describes adaptation honestly.
 
 **Dependencies/risks:** Poor weighting can over-repeat one topic. Cap repetition and test distribution.
 
-## Phase 5: Polish, Accessibility, and Portfolio Evidence
+## Phase 6: Polish, Accessibility, and Portfolio Evidence
 
 **Goal:** Prepare a credible public demonstration and record verified improvements.
 
@@ -86,7 +100,7 @@ Phases are sequential. Do not start the next phase until the current phase's exi
 
 **Dependencies/risks:** Deployment configuration and screenshot capture can expose unresolved polish issues. Keep a short fix list and avoid feature expansion.
 
-## Phase 6: Optional Extensions
+## Phase 7: Optional Extensions
 
 **Goal:** Add only extensions that have a demonstrated learning or trainer value.
 

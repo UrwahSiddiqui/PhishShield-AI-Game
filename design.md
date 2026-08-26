@@ -96,3 +96,13 @@ A calm report of accuracy, streak, category performance, and practical takeaways
 - Oversized hero copy that delays the first exercise.
 - Decorative diagrams that compete with communication evidence.
 - Tiny text, hover-only interactions, and red/green-only feedback.
+
+## Operations Simulation Experience
+
+The primary screen is a restrained corporate incident-response workspace. A command bar identifies fictional Northstar Systems, the active campaign, company health, threat state, and incident timer. A compact incident queue shows how the campaign is escalating. The message remains the main object; evidence and response tools frame the investigation rather than replacing it with dashboard widgets.
+
+Use text-labelled states for `Contained`, `Weak response`, `Missed`, `Escalated`, `Timed out`, and `Boss breach`. Health represents damage already suffered; threat represents campaign momentum. Both should show labels and numeric or plain-language changes, not decorative progress alone.
+
+The campaign briefing should read like a shift handoff: Monday 08:42, suspicious messages are reaching Northstar Systems, and the defender must contain the campaign. Keep it concise. The final report should show outcome, remaining health, final threat, incidents contained/missed, response accuracy, strongest skill, practice area, and defensive lessons.
+
+Timed mode creates pressure but never requires random clicking. Pause the timer when the browser is hidden or a debrief is open. Provide an untimed accessibility/training mode. Warn with text and accessible status updates; do not flash or rely on colour. Use restrained transitions for incident arrival, escalation, health impact, successful containment, and boss entry, with reduced motion support.

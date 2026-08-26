@@ -88,6 +88,20 @@
 - Explain learning purpose, security boundaries, accessibility choices, and known limitations plainly.
 - Add screenshots, demo links, and measured results only when they exist and are verified.
 
+## Simulation Rules
+
+- Keep company health and threat distinct, visible, bounded, and meaningful to campaign progression.
+- Centralize health impacts, threat changes, threat-state boundaries, response windows, timeout behavior, boss unlock, and win/loss thresholds in pure typed rules.
+- Treat inspection as free. Time pressure must not punish careful reading in untimed mode.
+- Resolve an incident exactly once, including timeout. React Strict Mode must not duplicate timers, damage, or submissions.
+- Pause timers when the document is hidden and while debrief or blocking modal UI is open.
+- Use realistic, scenario-specific defensive actions and explain partial correctness instead of forcing simplistic right/wrong teaching.
+- Boss incidents must combine taught techniques and remain evidence-solvable.
+
+## Simulation Test Requirements
+
+Test company-health boundaries, threat boundaries and state mapping, correct containment, incorrect allow, false-positive blocking, timeout exactly once, timer pause/resume where practical, incident advancement, boss unlock, campaign win/loss, recovery after a minor mistake, deterministic replay, duplicate-resolution prevention, and untimed mode.
+
 ## Manual Testing
 
 Before reporting a phase complete, perform a short manual pass in a current desktop browser and a narrow mobile viewport. Use the checklist in README.md when it exists, or record the exact temporary steps in memory.md. At minimum, manually verify start/setup, scenario inspection, decision submission, feedback, summary, replay/reset, keyboard-only operation, visible focus, reduced motion, narrow-width layout, and behavior when localStorage is unavailable or contains invalid data.
