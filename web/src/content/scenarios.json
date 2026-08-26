@@ -1,0 +1,39 @@
+[
+  {
+    "id": "email-invoice-domain", "title": "A changed invoice", "channel": "email", "difficulty": "guided", "category": "misleading-domain",
+    "sender": "Accounts Payable <billing@northstar-logistics.co>", "subject": "Invoice 8841 needs approval today",
+    "content": "Hi Maya, the attached invoice is overdue. Please review it before 4pm so we can release the supplier payment.",
+    "evidence": [{"label":"Sender domain","value":"northstar-logistics.co","kind":"strong","explanation":"The organisation normally uses northstar-logistics.com. A lookalike domain is strong evidence that the sender may not be who it claims."},{"label":"Urgency","value":"Approval requested today","kind":"context","explanation":"A deadline can be legitimate, but pressure should make you verify rather than click or open an unexpected file."}],
+    "correctClassification": "suspicious", "explanation": "This combines a lookalike domain with a payment request and an unexpected attachment. Verify the invoice through the supplier record or a known contact.", "safeAction": "Report the message and verify the invoice using a trusted channel.", "objective": "Compare a sender domain with the organisation you know.", "tags": ["domain", "attachment", "urgency"]
+  },
+  {
+    "id": "sms-password-reset", "title": "The password reset text", "channel": "sms", "difficulty": "guided", "category": "credential-harvesting",
+    "sender": "SecureDesk", "subject": "", "content": "Your password expires in 30 minutes. Keep access: https://secure-desk.example/reset?id=1842",
+    "evidence": [{"label":"Link destination","value":"secure-desk.example/reset","kind":"strong","explanation":"The link uses a training-only domain rather than the company identity. Do not use a link from an unexpected password message."},{"label":"Time pressure","value":"Expires in 30 minutes","kind":"strong","explanation":"A short deadline is designed to reduce careful checking and is a common credential-harvesting tactic."}],
+    "correctClassification": "phishing", "explanation": "The message asks you to protect access by following an unexpected link under a tight deadline. Navigate to the known service yourself instead.", "safeAction": "Do not open the link. Report the text and use the known IT portal.", "objective": "Recognise credential requests paired with urgency.", "tags": ["password", "link", "urgency"]
+  },
+  {
+    "id": "qr-parking-payment", "title": "A new parking payment", "channel": "qr-code", "difficulty": "practice", "category": "verification",
+    "sender": "Facilities notice", "subject": "", "content": "Parking payment has moved online. Scan the QR code at the entrance to avoid a £25 fee.",
+    "evidence": [{"label":"Destination preview","value":"parking-payments.example/zone-4","kind":"strong","explanation":"A QR code can hide its destination. Previewing it reveals a training-only payment site that is not the organisation's known service."},{"label":"Fee threat","value":"Avoid a £25 fee","kind":"context","explanation":"A consequence may be real, but a threat should not override verification. Check the official facilities page or ask staff."}],
+    "correctClassification": "suspicious", "explanation": "QR codes make destinations harder to inspect at a glance. Verify the payment instructions through a known facilities channel before scanning.", "safeAction": "Do not scan it. Confirm the payment process with facilities.", "objective": "Treat hidden QR destinations as links that need verification.", "tags": ["qr", "payment", "verification"]
+  },
+  {
+    "id": "login-mfa-fatigue", "title": "Approve this sign-in", "channel": "login-page", "difficulty": "practice", "category": "mfa-fatigue",
+    "sender": "Identity Portal", "subject": "New sign-in request", "content": "Approve the sign-in request on your phone to continue. If you did not request this, approve it to secure your account.",
+    "evidence": [{"label":"Unexpected approval","value":"You did not start a sign-in","kind":"strong","explanation":"An MFA prompt you did not initiate should be denied and reported. Approving it can hand an attacker a valid second factor."},{"label":"Contradictory instruction","value":"Approve it to secure your account","kind":"strong","explanation":"The message uses a false safety instruction to make an unsafe approval feel protective."}],
+    "correctClassification": "phishing", "explanation": "This is an MFA fatigue attempt. Never approve an unexpected prompt, even when the message frames approval as protection.", "safeAction": "Deny the prompt and contact IT through its known support route.", "objective": "Respond safely to unexpected MFA requests.", "tags": ["mfa", "approval", "social-engineering"]
+  },
+  {
+    "id": "ceo-travel-transfer", "title": "A quiet favour", "channel": "social-engineering", "difficulty": "challenge", "category": "authority-pressure",
+    "sender": "Jordan Lee, Chief Executive Officer <jordan.lee@northstar-logistics.com>", "subject": "Can you keep this between us?", "content": "I am in a meeting and need you to buy six digital gift cards for a client. Send the codes here and I will reimburse you.",
+    "evidence": [{"label":"Unusual payment route","value":"Gift cards and codes","kind":"strong","explanation":"Gift cards are difficult to recover and are a common payment demand in business email compromise."},{"label":"Authority and secrecy","value":"CEO + keep this between us","kind":"strong","explanation":"Authority and secrecy are social pressure tactics. They should prompt independent verification, not faster compliance."}],
+    "correctClassification": "phishing", "explanation": "A familiar display name does not prove identity. The unusual payment, secrecy, and authority pressure require verification by a known phone number or colleague.", "safeAction": "Do not buy anything. Verify the request using a known contact method and report it.", "objective": "Resist authority pressure and verify unusual financial requests.", "tags": ["bec", "authority", "payment"]
+  },
+  {
+    "id": "legitimate-calendar-update", "title": "The room changed", "channel": "email", "difficulty": "challenge", "category": "context",
+    "sender": "Campus Events <events@university.example>", "subject": "Room change: careers workshop", "content": "Today's workshop is now in Room 204 instead of Room 201. The event page has the updated map.",
+    "evidence": [{"label":"Sender identity","value":"events@university.example","kind":"safe","explanation":"The sender uses the known university domain and the request is informational rather than asking for credentials, money, or an unusual download."},{"label":"Minor imperfection","value":"Plain formatting","kind":"context","explanation":"Plain formatting or small writing imperfections are weak clues. Consider the complete context instead of treating them as proof."}],
+    "correctClassification": "safe", "explanation": "This message is consistent with a routine event update, uses a known domain, and makes no high-risk request. Still use the official event page rather than an unexpected attachment.", "safeAction": "You may read it, then verify the room on the official event page if needed.", "objective": "Avoid false positives by weighing context and request risk.", "tags": ["legitimate", "context", "false-positive"]
+  }
+]

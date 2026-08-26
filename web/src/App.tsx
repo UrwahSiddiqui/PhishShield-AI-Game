@@ -1,8 +1,67 @@
 import { useState } from 'react'
+import { scenarios, type Scenario } from './content/scenarioSchema'
+import { scoreAnswer, selectScenario, type Classification } from './domain/gameRules'
 import './App.css'
 
 function App() {
   const [difficulty, setDifficulty] = useState('guided')
+  const [currentScenario, setCurrentScenario] = useState<Scenario>()
+  const [expandedEvidence, setExpandedEvidence] = useState<string[]>([])
+  const [answer, setAnswer] = useState<Classification>()
+  const [score, setScore] = useState(0)
+  const [streak, setStreak] = useState(0)
+  const [completedIds, setCompletedIds] = useState<string[]>([])
+
+  const startTraining = () => {
+    setCurrentScenario(selectScenario(scenarios, [], difficulty))
+    setExpandedEvidence([])
+    setAnswer(undefined)
+    setScore(0)
+    setStreak(0)
+    setCompletedIds([])
+  }
+
+  const submitAnswer = (classification: Classification) => {
+    if (!currentScenario || answer) return
+    const result = scoreAnswer(currentScenario, classification, streak)
+    setAnswer(classification)
+    setScore((currentScore) => currentScore + result.score)
+    setStreak(result.nextStreak)
+    setCompletedIds((ids) => [...ids, currentScenario.id])
+  }
+
+  const continueTraining = () => {
+    const nextScenario = selectScenario(scenarios, completedIds, difficulty)
+    setCurrentScenario(nextScenario)
+    setExpandedEvidence([])
+    setAnswer(undefined)
+  }
+
+  if (currentScenario) {
+    const result = answer ? scoreAnswer(currentScenario, answer, Math.max(0, streak - (answer === currentScenario.correctClassification ? 1 : 0))) : undefined
+    return (
+      <div className="app-shell">
+        <header className="topbar"><a className="wordmark" href="/" onClick={(event) => { event.preventDefault(); setCurrentScenario(undefined) }}><span className="wordmark-mark" aria-hidden="true">PS</span><span>PhishShield</span></a><span className="status-label"><span aria-hidden="true" /> Training session / {difficulty}</span></header>
+        <main className="training-main">
+          <div className="training-header"><p className="eyebrow">Scenario {completedIds.length} of 6 <span>{score} points</span></p><p className="streak-label">{streak > 0 ? `${streak} in a row` : 'Build your streak'}</p></div>
+          <section className="scenario-layout" aria-labelledby="scenario-title">
+            <article className="message-card">
+              <div className="message-topline"><span>{currentScenario.channel.replace('-', ' ')}</span><span className="message-dot" aria-hidden="true">•</span><span>Training example</span></div>
+              <h1 id="scenario-title">{currentScenario.title}</h1>
+              <dl className="message-meta"><div><dt>From</dt><dd>{currentScenario.sender}</dd></div>{currentScenario.subject && <div><dt>Subject</dt><dd>{currentScenario.subject}</dd></div>}</dl>
+              <p className="message-body">{currentScenario.content}</p>
+              <p className="message-safe-note">This is a fictional training message. Do not follow links or scan codes from scenarios.</p>
+            </article>
+            <aside className="evidence-panel" aria-labelledby="evidence-title">
+              <p className="eyebrow">Investigation desk</p><h2 id="evidence-title">Inspect the evidence</h2><p className="evidence-intro">Open the details that help you decide. A clue is not always proof on its own.</p>
+              <div className="evidence-list">{currentScenario.evidence.map((evidence) => { const open = expandedEvidence.includes(evidence.label); return <div className={`evidence-item ${open ? 'open' : ''}`} key={evidence.label}><button type="button" aria-expanded={open} onClick={() => setExpandedEvidence((items) => open ? items.filter((item) => item !== evidence.label) : [...items, evidence.label])}><span>{evidence.label}</span><span aria-hidden="true">{open ? '−' : '+'}</span></button>{open && <div className="evidence-detail"><strong>{evidence.value}</strong><p>{evidence.explanation}</p></div>}</div> })}</div>
+            </aside>
+          </section>
+          {!answer ? <section className="decision-area" aria-labelledby="decision-title"><p className="eyebrow">Your call</p><h2 id="decision-title">What would you do next?</h2><div className="decision-buttons"><button type="button" onClick={() => submitAnswer('safe')}>Trust / safe</button><button type="button" onClick={() => submitAnswer('suspicious')}>Pause / suspicious</button><button type="button" onClick={() => submitAnswer('phishing')}>Report / phishing</button></div></section> : <section className={`feedback-panel ${result?.correct ? 'correct' : 'incorrect'}`} aria-live="polite" aria-labelledby="feedback-title"><p className="eyebrow">Debrief</p><h2 id="feedback-title">{result?.correct ? 'Good call.' : 'Worth a closer look.'}</h2><p className="feedback-verdict">The safest classification was <strong>{currentScenario.correctClassification}</strong>.</p><p>{currentScenario.explanation}</p><div className="feedback-columns"><div><span>Next best action</span><p>{currentScenario.safeAction}</p></div><div><span>Learning objective</span><p>{currentScenario.objective}</p></div></div><button className="start-button next-button" type="button" onClick={continueTraining}>Next scenario <span aria-hidden="true">→</span></button></section>}
+        </main>
+      </div>
+    )
+  }
 
   return (
     <div className="app-shell">
@@ -49,7 +108,7 @@ function App() {
                 <span className="mode-mark" aria-hidden="true">{difficulty === 'challenge' ? '●' : '○'}</span>
               </label>
             </fieldset>
-            <button className="start-button" type="button">Start training <span aria-hidden="true">↗</span></button>
+            <button className="start-button" type="button" onClick={startTraining}>Start training <span aria-hidden="true">↗</span></button>
             <p className="privacy-note"><span aria-hidden="true">◌</span> Progress stays in this browser. No account required.</p>
           </aside>
         </section>
