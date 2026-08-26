@@ -2,6 +2,18 @@ import { describe, expect, it } from 'vitest'
 import { scenarios } from '../content/scenarioSchema'
 import { scoreAnswer, selectScenario } from './gameRules'
 
+describe('curated scenario content', () => {
+  it('has unique ids and covers every supported channel', () => {
+    const ids = scenarios.map((scenario) => scenario.id)
+    expect(new Set(ids).size).toBe(ids.length)
+    expect(new Set(scenarios.map((scenario) => scenario.channel))).toEqual(new Set(['email', 'sms', 'qr-code', 'login-page', 'social-engineering']))
+  })
+
+  it('gives every scenario evidence and an explainable safe action', () => {
+    expect(scenarios.every((scenario) => scenario.evidence.length > 0 && scenario.explanation && scenario.safeAction)).toBe(true)
+  })
+})
+
 describe('scoreAnswer', () => {
   it('rewards a correct answer and extends the streak', () => {
     const result = scoreAnswer(scenarios[0], scenarios[0].correctClassification, 2)

@@ -80,7 +80,7 @@ function App() {
             <h1 id="page-title">Pause. Inspect.<br /><em>Then decide.</em></h1>
             <p className="lede">PhishShield helps you build the habit of reading messages with care. Study the evidence, spot the pressure tactics, and choose the safest next step.</p>
             <div className="intro-meta">
-              <span><strong>12</strong> scenarios</span>
+              <span><strong>6</strong> starter scenarios</span>
               <span><strong>5</strong> channels</span>
               <span><strong>10 min</strong> average session</span>
             </div>
