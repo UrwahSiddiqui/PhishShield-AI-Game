@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   createCampaignState,
+  advanceIncidentTime,
   getCampaignSummary,
   getThreatState,
   isBossAvailable,
@@ -78,6 +79,21 @@ describe('incident resolution', () => {
     expect(timedOut.companyHealth).toBe(95)
     expect(timedOut.threatScore).toBe(12)
     expect(duplicate).toEqual(timedOut)
+  })
+
+  it('counts down without resolving until the response window expires', () => {
+    const state = createCampaignState(campaign)
+    const warning = advanceIncidentTime(campaign, state, 30)
+    expect(warning.remainingTimeSeconds).toBe(60)
+    expect(warning.playerResponses).toHaveLength(0)
+    const expired = advanceIncidentTime(campaign, warning, 60)
+    expect(expired.playerResponses).toHaveLength(1)
+    expect(expired.playerResponses[0].status).toBe('timed-out')
+  })
+
+  it('does not count down in untimed mode', () => {
+    const state = createCampaignState(campaign, 'untimed')
+    expect(advanceIncidentTime(campaign, state, 500)).toEqual(state)
   })
 })
 

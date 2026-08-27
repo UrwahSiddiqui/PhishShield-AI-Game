@@ -40,6 +40,7 @@ footer { display: flex; justify-content: space-between; max-width: 1320px; margi
 .metric, .timer-metric { display: grid; gap: 4px; padding-left: 20px; border-left: 1px solid var(--dark-border); }
 .metric strong, .timer-metric strong { color: var(--on-dark); font-family: var(--heading); font-size: 1.25rem; font-weight: 400; }
 .metric.safe strong { color: var(--sage); }.metric.warn strong { color: var(--amber-light); }.metric.danger strong { color: var(--coral); }
+.timer-warning strong { color: var(--coral); }
 .operations { padding: 44px 42px 100px; }
 .operations-heading { display: flex; align-items: end; justify-content: space-between; margin-bottom: 35px; }.operations-heading h1 { margin: 18px 0 0; font-size: clamp(3rem, 5vw, 5.5rem); }.mode-chip { padding: 8px 11px; border: 1px solid var(--dark-border); color: var(--dark-soft); font-family: var(--mono); font-size: .68rem; }
 .queue { display: grid; grid-template-columns: repeat(3, 1fr); margin-bottom: 32px; border: 1px solid var(--dark-border); }.queue-item { display: grid; grid-template-columns: 32px 1fr; gap: 2px 10px; padding: 15px 18px; border-right: 1px solid var(--dark-border); color: var(--dark-muted); }.queue-item:last-child { border-right: 0; }.queue-item.active { background: var(--panel); color: var(--on-dark); box-shadow: inset 0 -3px var(--amber); }.queue-item.boss strong { color: var(--coral); }.queue-item span { grid-row: span 2; color: var(--amber-light); font-family: var(--mono); font-size: .7rem; }.queue-item strong { font-size: .78rem; }.queue-item small { font-size: .68rem; }

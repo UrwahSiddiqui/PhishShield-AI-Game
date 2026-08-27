@@ -154,6 +154,12 @@ export function timeoutIncident(campaign: CampaignDefinition, state: CampaignSta
   })
 }
 
+export function advanceIncidentTime(campaign: CampaignDefinition, state: CampaignState, elapsedSeconds: number): CampaignState {
+  if (state.mode === 'untimed' || state.incidentStatus !== 'active' || elapsedSeconds <= 0) return state
+  if (state.remainingTimeSeconds <= elapsedSeconds) return timeoutIncident(campaign, state)
+  return { ...state, remainingTimeSeconds: state.remainingTimeSeconds - elapsedSeconds }
+}
+
 function applyResolution(campaign: CampaignDefinition, state: CampaignState, incident: IncidentDefinition, response: PlayerResponse): CampaignState {
   const companyHealth = clamp(state.companyHealth + response.healthDelta)
   const threatScore = clamp(state.threatScore + response.threatDelta)
