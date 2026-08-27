@@ -13,6 +13,7 @@ import {
   type Classification,
   type DefensiveAction,
 } from './domain/campaignEngine'
+import { clearCampaignState, readCampaignState, writeCampaignState } from './storage/progressStore'
 
 const actionLabels: Record<DefensiveAction, string> = {
   allow: 'Allow message',
@@ -25,9 +26,13 @@ const actionLabels: Record<DefensiveAction, string> = {
 
 function App() {
   const [mode, setMode] = useState<CampaignMode>('untimed')
-  const [campaignState, setCampaignState] = useState<CampaignState>()
+  const [campaignState, setCampaignState] = useState<CampaignState | undefined>(() => readCampaignState())
   const [expandedEvidence, setExpandedEvidence] = useState<string[]>([])
   const [lastResponse, setLastResponse] = useState<CampaignState>()
+
+  useEffect(() => {
+    if (campaignState) writeCampaignState(campaignState)
+  }, [campaignState])
 
   useEffect(() => {
     if (!campaignState || campaignState.mode === 'untimed' || campaignState.incidentStatus !== 'active' || lastResponse) return
@@ -46,6 +51,7 @@ function App() {
   }, [campaignState, lastResponse])
 
   const startCampaign = () => {
+    clearCampaignState()
     setCampaignState(createCampaignState(northstarCampaign, mode))
     setLastResponse(undefined)
     setExpandedEvidence([])

@@ -6,7 +6,7 @@ The current web application is an approved rebuild of the original university Py
 
 ## Project Status
 
-Phase 1 is in progress on `feat/web-foundation`. The responsive landing and training-setup screen is available in `web/`; the legacy Python/Pygame prototype remains in the repository as historical evidence and has not been deleted.
+The campaign simulation is in progress on `feat/web-foundation`. The responsive web app in `web/` now includes a campaign briefing, operations workspace, incident queue, company health, threat momentum, timed and untimed modes, evidence inspection, operational responses, incident reports, boss escalation, campaign win/loss, and local campaign persistence. The legacy Python/Pygame prototype remains in the repository as historical evidence and has not been deleted.
 
 ## Run Locally
 
@@ -30,19 +30,21 @@ The production build is configured for GitHub Pages at `/PhishShield-AI-Game/`. 
 
 ## Manual Testing
 
-Use this checklist for the current landing/setup screen and repeat it as each phase adds gameplay:
+Use this checklist for the current campaign build and repeat it as each phase adds coverage:
 
 1. Start the dev server with `Set-Location web; npm.cmd run dev` and open the printed URL.
-2. At a desktop width, confirm the PhishShield title, learning purpose, session facts, training modes, and privacy note are visible without overlap.
-3. Select each of the three training modes with a mouse and confirm only the selected mode shows the selected state.
-4. Press `Tab` from the address bar through the page. Confirm the home link, each mode, and Start training button receive a clear visible focus indicator.
-5. Use arrow keys or `Tab` and `Space` to change the radio selection. Confirm the selected mode updates without a page reload.
-6. Resize the browser to a narrow mobile width, such as 375px. Confirm there is no horizontal scrolling, text is readable, and the setup panel remains usable.
-7. Enable `prefers-reduced-motion` in browser accessibility or dev tools and confirm the interface does not depend on motion to communicate information.
-8. Open browser dev tools and set localStorage access to blocked, when supported. Confirm the landing screen still loads; future progress features must remain usable without storage.
-9. Repeat the checks in a current Chromium-based browser and Firefox. Record browser, viewport, result, and any issue in the relevant phase notes.
-
-When scenario play is available, extend the checklist with: inspect evidence by keyboard, submit exactly one decision, read the complete rationale, continue to the next scenario, finish the summary, replay, reset progress, and reload with malformed localStorage data.
+2. At a desktop width, confirm the briefing explains the defender role, fictional company, campaign, and timed/untimed modes without overlap.
+3. Select both response modes with a mouse and keyboard. Confirm the selected state changes and `Take the shift` starts the campaign.
+4. In untimed mode, inspect evidence with `Tab` and `Enter`, choose a context-relevant response, read the incident report, and return to the queue.
+5. Confirm the queue marks resolved stages, the next incident becomes active, and company health/threat values remain visible.
+6. Complete the untimed campaign using report/report/verify. Confirm the boss report appears before the campaign result and the result shows a win.
+7. Replay and complete the campaign using allow/allow/allow. Confirm health and threat consequences are visible and the result shows a loss.
+8. Select live response and confirm the first incident timer counts down. Verify that no answer can be submitted twice.
+9. Resize to approximately 375px. Confirm there is no horizontal scrolling, the message remains readable, the queue stacks, and response controls remain usable.
+10. Use `Tab` only to inspect evidence and submit responses. Confirm every control has a visible focus indicator and status text is understandable without colour.
+11. Enable `prefers-reduced-motion` and confirm no essential information depends on animation. Hide the tab during live response and verify the timer pauses when you return.
+12. Reload during an active campaign and confirm the operations workspace resumes. Test malformed or blocked localStorage and confirm the app still loads without saved progress.
+13. Repeat the checks in a current Chromium-based browser and Firefox. Record browser, viewport, result, and any issue in the relevant phase notes.
 
 ## Legacy Audit
 
@@ -62,7 +64,7 @@ See [PRD.md](PRD.md), [Architecture.md](Architecture.md), [rules.md](rules.md), 
 
 ## Testing
 
-The web project currently has TypeScript/build and lint checks. Scenario rules, content validation, component tests, and Playwright journeys will be added in later phases before the MVP is described as complete.
+The web project currently has TypeScript/build, lint, campaign-engine, content-validation, and persistence checks. Component tests, timer lifecycle tests with fake browser visibility, and a committed Playwright suite will be added before the MVP is described as complete.
 
 ## Honest Limitations
 
