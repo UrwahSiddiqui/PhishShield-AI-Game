@@ -30,7 +30,15 @@ Phases are sequential. Do not start the next phase until the current phase's exi
 
 **Dependencies/risks:** GitHub Pages base-path configuration affects deployment. Typography or media assets may affect performance.
 
-## Phase 2: Campaign Engine and Simulation Rules
+## Phase 2R: Mixed Operations Vertical Slice (Current Gate)
+
+**Goal:** Validate the approved hybrid SOC and DevOps reset with one polished, replayable three-incident shift.
+
+**Scope:** Legitimate traffic load, failed deployment, and phishing-led endpoint compromise; pure operations engine; live topology; diagnostic telemetry; evidence tools; operational actions; concise consequence review; timed and untimed play.
+
+**Exit criteria:** Automated engine checks pass, all three incidents are manually playable on desktop and narrow mobile, hidden-tab time pause and keyboard operation are verified, and Urwah approves the new loop for expansion. The 20-scenario phishing expansion and adaptive weighting are paused until this review.
+
+## Phase 2 (Superseded): Campaign Engine and Simulation Rules
 
 **Goal:** Replace the flat quiz loop with a pure, testable corporate campaign engine before expanding scenario content.
 

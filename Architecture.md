@@ -168,6 +168,8 @@ Build a static asset bundle and deploy it to GitHub Pages after the local MVP is
 
 ## Campaign Simulation Boundary
 
+The campaign engine below is preserved for replacement review but is no longer used by the active screen. It must not be deleted silently.
+
 The approved simulation engine sits between React and scenario content. React owns presentation and timer orchestration; pure domain functions own campaign initialization, response resolution, health and threat changes, timeout consequences, stage advancement, boss unlock, summary statistics, and win/loss evaluation.
 
 The campaign state includes `campaignId`, `currentIncidentIndex`, `resolvedIncidentIds`, `companyHealth`, `threatScore`, `threatState`, `incidentStatus`, `remainingTime`, `containmentStreak`, `campaignOutcome`, `playerResponses`, and `mode`. A response records incident ID, classification, operational action, selected evidence IDs, result, and timestamp. Derived values should not be duplicated in React state.
@@ -190,3 +192,9 @@ Rules:
 - `IncidentReport`: explains operational outcome, health delta, threat delta, evidence, and learning takeaway.
 - `campaignEngine`: pure campaign state transitions and summary functions.
 - `timerController`: hidden-tab pause, debrief pause, timeout dispatch, and untimed behavior without direct state mutation.
+
+## Operations Simulation Boundary
+
+`web/src/domain/operationsEngine.ts` is the active pure TypeScript domain boundary. It owns the three incident definitions, evidence findings, central scoring and health constants, tool inspection, action resolution, timeout idempotency, incident advancement, and shift completion. It has no React, DOM, storage, or network dependency. React owns timer orchestration, visibility pause, layout, topology selection, and rendering only.
+
+The network map communicates asset relationships, selection, health, and the affected system with text as well as colour. Telemetry series are incident evidence: their correlations must support diagnosis rather than decorate the view. React receives root-cause data as part of the bundled incident definition but renders it only in the post-resolution review.

@@ -2,9 +2,9 @@
 
 ## Visual Direction and Personality
 
-PhishShield should feel like a modern editorial investigation desk: calm, observant, direct, and a little tactile. Use a deep-neutral foundation with warm paper-like surfaces for the communication artifact. The player studies a communication, opens evidence, forms a judgment, and learns why that judgment matters. The visual language should make the message artifact feel real enough to examine without imitating a live service or creating panic.
+PhishShield should feel like a restrained, live operations centre: dense enough to reward correlation, calm enough to remain readable, and grounded in a fictional company's actual service relationships. The earlier article and message-centric direction is superseded for active play.
 
-Use charcoal and deep navy-neutral framing, warm off-white and soft stone surfaces for readable content, cobalt or aubergine for primary actions, amber for suspicious indicators, and coral/red only for a genuine danger or incorrect outcome. Avoid neon-green hacker styling, generic dark cybersecurity dashboards, glossy gradients, and decorative noise. The scenario itself is the visual focus.
+Use deep operational surfaces, restrained teal for live and healthy states, amber for investigation, and red only for genuine critical impact. The topology, telemetry, alert queue, evidence sources, response tools, and event stream form one connected workspace. Graphics must carry gameplay information: affected nodes identify scope, charts reveal correlations, and transitions communicate state changes. Active copy uses short timestamps, asset IDs, measurements, and observable facts; detailed reasoning waits for the incident review.
 
 ## Colour Palette
 

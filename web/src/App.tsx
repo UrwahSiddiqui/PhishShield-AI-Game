@@ -1,100 +1,38 @@
 import { useEffect, useState } from 'react'
 import './App.css'
-import { scenarios, type Scenario } from './content/scenarioSchema'
-import { northstarCampaign } from './domain/campaign'
-import {
-  advanceIncidentTime,
-  createCampaignState,
-  getCampaignSummary,
-  getCurrentIncident,
-  resolveIncident,
-  type CampaignMode,
-  type CampaignState,
-  type Classification,
-  type DefensiveAction,
-} from './domain/campaignEngine'
-import { clearCampaignState, readCampaignState, writeCampaignState } from './storage/progressStore'
+import { advanceIncident, createOpsState, incidents, inspectTool, resolveAction, selectAsset, tick, type OpsState, type ServiceId } from './domain/operationsEngine'
 
-const classificationLabels: Record<Classification, string> = {
-  safe: 'Safe',
-  suspicious: 'Suspicious',
-  phishing: 'Phishing',
+const assets: { id: ServiceId; name: string; sub: string; x: number; y: number }[] = [
+  { id: 'edge', name: 'EDGE-01', sub: 'WAF / load balancer', x: 10, y: 48 }, { id: 'api', name: 'API CLUSTER', sub: 'API-01 / API-02', x: 34, y: 27 }, { id: 'payments', name: 'PAYMENTS', sub: 'PAY-01', x: 58, y: 27 }, { id: 'database', name: 'DATABASE', sub: 'DB-01 primary', x: 82, y: 48 }, { id: 'identity', name: 'IDENTITY', sub: 'SSO / MFA', x: 34, y: 73 }, { id: 'endpoints', name: 'ENDPOINTS', sub: 'Finance / staff', x: 65, y: 73 },
+]
+
+export default function App() {
+  const [state, setState] = useState<OpsState>()
+  const [mode, setMode] = useState<OpsState['mode']>('timed')
+  useEffect(() => { if (!state || state.mode === 'untimed' || state.incidentStatus !== 'active') return; const timer = window.setInterval(() => { if (!document.hidden) setState((current) => current ? tick(current) : current) }, 1000); return () => window.clearInterval(timer) }, [state])
+  if (!state) return <Start mode={mode} setMode={setMode} start={() => setState(createOpsState(mode))} />
+  if (state.shiftOutcome !== 'in-progress') return <Summary state={state} replay={() => setState(createOpsState(mode))} />
+  if (state.incidentStatus === 'review') return <Review state={state} next={() => setState(advanceIncident(state))} />
+  return <Dashboard state={state} setState={setState} />
 }
 
-const actionLabels: Record<DefensiveAction, string> = {
-  allow: 'Allow message',
-  quarantine: 'Quarantine',
-  report: 'Report phishing',
-  verify: 'Verify through trusted channel',
-  block: 'Block sender / domain',
-  escalate: 'Escalate to security',
+function Brand() { return <div className="brand"><span className="brand-mark">PS</span><span><strong>PHISHSHIELD</strong><small>NORTHSTAR SOC</small></span></div> }
+function Start({ mode, setMode, start }: { mode: OpsState['mode']; setMode: (mode: OpsState['mode']) => void; start: () => void }) { return <main className="start-screen"><section><Brand /><p className="kicker">SHIFT 07 / NORTHSTAR COMMERCE</p><h1>Keep the company<br /><span>secure and online.</span></h1><p className="start-copy">Operate a live company environment. Correlate alerts, infrastructure, and business signals. Respond without turning normal activity into an incident.</p><div className="mode-picker" role="radiogroup" aria-label="Shift timing"><button className={mode === 'timed' ? 'active' : ''} role="radio" aria-checked={mode === 'timed'} onClick={() => setMode('timed')}>Live / timed</button><button className={mode === 'untimed' ? 'active' : ''} role="radio" aria-checked={mode === 'untimed'} onClick={() => setMode('untimed')}>Training / untimed</button></div><button className="launch" onClick={start}>Start live shift <span>→</span></button><p className="fine-print">Fictional systems. Local-only session. No live links or credentials.</p></section><aside className="start-status"><p>PRE-FLIGHT STATUS</p>{['Edge network ready','Application telemetry online','Identity signals connected','Endpoint sensors online'].map((item) => <div key={item}><span>●</span>{item}<b>OK</b></div>)}<dl><div><dt>Incidents</dt><dd>03</dd></div><div><dt>Health</dt><dd>100%</dd></div><div><dt>Role</dt><dd>SOC + DEVOPS</dd></div></dl></aside></main> }
+
+function Dashboard({ state, setState }: { state: OpsState; setState: (state: OpsState) => void }) {
+  const incident = incidents[state.incidentIndex]
+  return <div className="ops-shell"><Header state={state} /><main className="dashboard">
+    <section className="topology panel"><PanelHead eyebrow="LIVE INFRASTRUCTURE" title="Company network" meta="6 ASSETS / 1 AFFECTED" /><div className="map" role="group" aria-label="Company infrastructure map"><svg viewBox="0 0 100 100"><path d="M14 48 L34 27 L58 27 L82 48 M14 48 L34 73 L65 73 L82 48 M34 27 L34 73 M58 27 L65 73" /></svg>{assets.map((asset) => { const affected = asset.id === incident.affectedAsset; return <button key={asset.id} style={{ left: `${asset.x}%`, top: `${asset.y}%` }} className={`node ${affected ? 'affected' : ''} ${state.selectedAsset === asset.id ? 'selected' : ''}`} aria-label={`${asset.name}, ${affected ? 'affected' : 'healthy'}`} onClick={() => setState(selectAsset(state, asset.id))}><i /><strong>{asset.name}</strong><small>{asset.sub}</small><em>{affected ? 'AFFECTED' : 'HEALTHY'}</em></button>})}</div><div className="asset-readout"><span>SELECTED ASSET</span><strong>{assets.find((item) => item.id === state.selectedAsset)?.name}</strong><small>{state.selectedAsset === incident.affectedAsset ? incident.alert : 'Telemetry within baseline'}</small></div></section>
+    <section className="alerts panel"><PanelHead eyebrow="ALERT QUEUE" title="Active signals" meta="4 OPEN" /><article className={`alert active ${incident.severity}`}><span>01</span><div><small>{incident.source} / NOW</small><strong>{incident.title}</strong><p>{incident.alert}</p><em>{incident.affectedAsset.toUpperCase()} / ACTIONABLE</em></div></article>{['Certificate expiry / 29 days','Backup completed / DB-01','VPN failures / within baseline'].map((text, i) => <article className="alert noise" key={text}><span>0{i + 2}</span><div><small>MONITOR / {i + 2}M</small><strong>{text}</strong><em>{i === 1 ? 'INFO' : 'LOW'}</em></div></article>)}</section>
+    <section className="telemetry panel"><PanelHead eyebrow="LIVE TELEMETRY" title="Correlated signals" meta="30 SEC WINDOW" /><div className="charts">{incident.telemetry.map((series) => <div className="chart" key={series.label}><header><span>{series.label}</span><strong className={series.tone}>{series.value}</strong></header><Spark points={series.points} tone={series.tone} /></div>)}</div></section>
+    <section className="investigation panel"><PanelHead eyebrow="INVESTIGATION" title="Evidence sources" meta={`${state.inspectedTools.length}/${incident.tools.length} OPENED`} /><div className="tool-tabs">{incident.tools.map((tool) => <button key={tool.id} className={state.inspectedTools.includes(tool.id) ? 'opened' : ''} onClick={() => setState(inspectTool(state, tool.id))}>{tool.label}<span>{state.inspectedTools.includes(tool.id) ? 'VIEWED' : 'OPEN'}</span></button>)}</div><div className="findings" aria-live="polite">{state.inspectedTools.length === 0 ? <p className="empty">Select a source. Findings are observations, not conclusions.</p> : incident.tools.filter((tool) => state.inspectedTools.includes(tool.id)).map((tool) => <article key={tool.id}><small>{tool.label.toUpperCase()} / {tool.finding.label}</small><strong>{tool.finding.value}</strong><p>{tool.finding.detail}</p></article>)}</div></section>
+    <section className="actions panel"><PanelHead eyebrow="RESPONSE" title="Take operational action" meta="RESOLVES INCIDENT" /><div className="action-list">{incident.actions.map((action) => <button key={action.id} onClick={() => setState(resolveAction(state, action.id))}><span><strong>{action.label}</strong><small>{action.consequence}</small></span><b>→</b></button>)}</div></section>
+    <section className="stream panel"><PanelHead eyebrow="EVENT STREAM" title="Northstar activity" meta="LIVE" /><ol>{incident.events.map((event, i) => <li key={event}><time>+0{i}:00</time><span className={i >= 2 ? 'warn-dot' : ''} />{event}</li>)}</ol></section>
+  </main></div>
 }
 
-function App() {
-  const [mode, setMode] = useState<CampaignMode>('untimed')
-  const [campaignState, setCampaignState] = useState<CampaignState | undefined>(() => readCampaignState())
-  const [expandedEvidence, setExpandedEvidence] = useState<string[]>([])
-  const [lastResponse, setLastResponse] = useState<CampaignState>()
-
-  useEffect(() => {
-    if (campaignState) writeCampaignState(campaignState)
-  }, [campaignState])
-
-  useEffect(() => {
-    if (!campaignState || campaignState.mode === 'untimed' || campaignState.incidentStatus !== 'active' || lastResponse) return
-    const interval = window.setInterval(() => {
-      if (document.hidden) return
-      setCampaignState((state) => {
-        if (!state) return state
-        const nextState = advanceIncidentTime(northstarCampaign, state, 1)
-        if (nextState.playerResponses.length > state.playerResponses.length) setLastResponse(nextState)
-        return nextState
-      })
-    }, 1000)
-    return () => window.clearInterval(interval)
-  }, [campaignState, lastResponse])
-
-  const startCampaign = () => {
-    clearCampaignState()
-    setCampaignState(createCampaignState(northstarCampaign, mode))
-    setLastResponse(undefined)
-    setExpandedEvidence([])
-  }
-
-  const resolve = (classification: Classification, action: DefensiveAction) => {
-    if (!campaignState || campaignState.incidentStatus !== 'active') return
-    const nextState = resolveIncident(northstarCampaign, campaignState, { classification, action })
-    setCampaignState(nextState)
-    setLastResponse(nextState)
-    setExpandedEvidence([])
-  }
-
-  if (!campaignState) return <Briefing mode={mode} setMode={setMode} onStart={startCampaign} />
-  if (lastResponse) return <IncidentReport state={lastResponse} onContinue={() => setLastResponse(undefined)} />
-  if (campaignState.campaignOutcome !== 'in-progress') return <CampaignSummary state={campaignState} onReplay={startCampaign} />
-
-  const incident = getCurrentIncident(northstarCampaign, campaignState)
-  const scenario = scenarios.find((item) => item.id === incident?.scenarioId)
-  if (!incident || !scenario) return <main className="error-state"><h1>Campaign unavailable</h1><p>The training campaign could not load its current incident.</p></main>
-
-  return <Workspace state={campaignState} scenario={scenario} incidentId={incident.id} expandedEvidence={expandedEvidence} setExpandedEvidence={setExpandedEvidence} onResolve={resolve} />
-}
-
-type BriefingProps = { mode: CampaignMode; setMode: (mode: CampaignMode) => void; onStart: () => void }
-function Briefing({ mode, setMode, onStart }: BriefingProps) {
-  return <div className="app-shell"><header className="topbar"><a className="wordmark" href="/" aria-label="PhishShield home"><span className="wordmark-mark" aria-hidden="true">PS</span><span>PhishShield</span></a><span className="status-label"><span aria-hidden="true" /> Defender station / local only</span></header><main className="briefing"><div className="briefing-copy"><p className="eyebrow">Northstar Systems / shift handoff</p><h1>Monday morning.<br /><em>Campaign active.</em></h1><p className="lede">At 08:42, suspicious messages began reaching employees across the company. You are the defender on duty. Investigate the incidents, contain the campaign, and keep operations moving.</p><div className="briefing-facts"><span><strong>05</strong> connected incidents</span><span><strong>01</strong> boss incident</span><span><strong>100</strong> starting health</span></div></div><section className="briefing-panel" aria-labelledby="briefing-title"><p className="panel-kicker">Campaign briefing <span>01</span></p><h2 id="briefing-title">Choose your response mode</h2><p className="panel-description">The campaign is designed for careful investigation. Untimed mode is available for accessibility and training.</p><div className="mode-list"><label className={mode === 'untimed' ? 'mode selected' : 'mode'}><input type="radio" name="mode" checked={mode === 'untimed'} onChange={() => setMode('untimed')} /><span className="mode-copy"><strong>Untimed investigation</strong><small>Study each incident without timeout pressure</small></span><span className="mode-mark" aria-hidden="true">{mode === 'untimed' ? '●' : '○'}</span></label><label className={mode === 'timed' ? 'mode selected' : 'mode'}><input type="radio" name="mode" checked={mode === 'timed'} onChange={() => setMode('timed')} /><span className="mode-copy"><strong>Live response</strong><small>Incident clocks create realistic operational pressure</small></span><span className="mode-mark" aria-hidden="true">{mode === 'timed' ? '●' : '○'}</span></label></div><button className="primary-button" type="button" onClick={onStart}>Take the shift <span aria-hidden="true">↗</span></button><p className="privacy-note">Training data stays in this browser. No account or live links required.</p></section></main><footer><span>PhishShield Cyber Awareness Game</span><span>Fictional company / educational simulation</span></footer></div>
-}
-
-type WorkspaceProps = { state: CampaignState; scenario: Scenario; incidentId: string; expandedEvidence: string[]; setExpandedEvidence: (items: string[]) => void; onResolve: (classification: Classification, action: DefensiveAction) => void }
-function Workspace({ state, scenario, incidentId, expandedEvidence, setExpandedEvidence, onResolve }: WorkspaceProps) {
-  const incident = northstarCampaign.incidents.find((item) => item.id === incidentId)!
-  const [classification, setClassification] = useState<Classification>()
-  const chooseAction = (action: DefensiveAction) => { if (classification) onResolve(classification, action) }
-  return <div className="app-shell"><header className="command-bar"><a className="wordmark" href="/" aria-label="Return to briefing"><span className="wordmark-mark" aria-hidden="true">PS</span><span>PhishShield</span></a><div className="campaign-name"><span>Active campaign</span><strong>{northstarCampaign.name}</strong></div><Metric label="Company health" value={`${state.companyHealth}%`} tone={state.companyHealth < 50 ? 'danger' : 'safe'} /><Metric label={`Threat / ${state.threatState}`} value={`${state.threatScore}%`} tone={state.threatScore >= 60 ? 'danger' : 'warn'} /><div className={`timer-metric ${state.mode === 'timed' && state.remainingTimeSeconds <= 15 ? 'timer-warning' : ''}`} aria-live="polite"><span>Response window</span><strong>{state.mode === 'untimed' ? 'No timeout' : `${state.remainingTimeSeconds}s`}</strong></div></header><main className="operations"><div className="operations-heading"><div><p className="eyebrow">Defender station / incident {state.currentIncidentIndex + 1}</p><h1>Investigate and contain.</h1></div><span className="mode-chip">{state.mode === 'untimed' ? 'Untimed training' : 'Live response'}</span></div><div className="queue" aria-label="Campaign incident queue">{northstarCampaign.incidents.map((item, index) => <div className={`queue-item ${index === state.currentIncidentIndex ? 'active' : ''} ${item.isBoss ? 'boss' : ''}`} key={item.id}><span>{String(index + 1).padStart(2, '0')}</span><strong>{item.isBoss ? 'Boss incident' : `Stage ${item.stage}`}</strong><small>{state.resolvedIncidentIds.includes(item.id) ? 'Resolved' : index === state.currentIncidentIndex ? 'In review' : 'Queued'}</small></div>)}</div><section className="incident-layout" aria-labelledby="incident-title"><article className="message-card"><div className="message-topline"><span>{scenario.channel.replace('-', ' ')}</span><span className="message-dot" aria-hidden="true">•</span><span>{incident.isBoss ? 'High-impact incident' : 'Inbound report'}</span></div><h2 id="incident-title">{scenario.title}</h2><dl className="message-meta"><div><dt>From</dt><dd>{scenario.sender}</dd></div>{scenario.subject && <div><dt>Subject</dt><dd>{scenario.subject}</dd></div>}</dl><p className="message-body">{scenario.content}</p><p className="message-safe-note">Fictional training message. Do not follow links or scan codes from scenarios.</p></article><aside className="evidence-panel" aria-labelledby="evidence-title"><p className="eyebrow">Evidence tools</p><h2 id="evidence-title">Inspect before responding</h2><p className="evidence-intro">Observable details inform your response. Inspection has no operational cost.</p><div className="evidence-list">{scenario.evidence.map((evidence) => { const open = expandedEvidence.includes(evidence.label); return <div className="evidence-item" key={evidence.label}><button type="button" aria-expanded={open} onClick={() => setExpandedEvidence(open ? expandedEvidence.filter((item) => item !== evidence.label) : [...expandedEvidence, evidence.label])}><span>{evidence.label}</span><span aria-hidden="true">{open ? '−' : '+'}</span></button>{open && <div className="evidence-detail"><strong>{evidence.value}</strong><p>{evidence.explanation}</p></div>}</div> })}</div></aside></section><section className="response-area" aria-labelledby="response-title"><div><p className="eyebrow">Operational response</p><h2 id="response-title">Classify, then contain.</h2><p className="response-help">First classify the message. Then choose the action that best limits its impact.</p><div className="classification-list">{(['safe', 'suspicious', 'phishing'] as Classification[]).map((item) => <button type="button" className={`classification-button ${classification === item ? 'selected' : ''}`} aria-pressed={classification === item} key={item} onClick={() => setClassification(item)}>{classificationLabels[item]}</button>)}</div></div><div className="response-grid">{incident.containmentActions.map((action) => <button type="button" className="response-button" disabled={!classification} key={action} onClick={() => chooseAction(action)}><strong>{actionLabels[action]}</strong><small>{action === 'verify' ? 'Use a known channel to confirm the request' : action === 'report' ? 'Send the message to the security team' : action === 'block' ? 'Stop further messages from this source' : 'Escalate the risk for coordinated response'}</small></button>)}<button type="button" className="response-button secondary" onClick={() => onResolve('safe', 'allow')}><strong>Allow / no action</strong><small>Leave the message available to the recipient</small></button></div></section></main></div>
-}
-
-function Metric({ label, value, tone }: { label: string; value: string; tone: string }) { return <div className={`metric ${tone}`}><span>{label}</span><strong>{value}</strong></div> }
-function IncidentReport({ state, onContinue }: { state: CampaignState; onContinue: () => void }) { const response = state.playerResponses[state.playerResponses.length - 1]; const incident = northstarCampaign.incidents.find((item) => item.id === response.incidentId)!; const scenario = scenarios.find((item) => item.id === incident.scenarioId)!; const contained = response.status === 'contained'; return <div className="app-shell"><header className="command-bar"><a className="wordmark" href="/" aria-label="Return to briefing"><span className="wordmark-mark" aria-hidden="true">PS</span><span>PhishShield</span></a><div className="campaign-name"><span>Incident report</span><strong>{incident.isBoss ? 'Boss incident' : `Stage ${incident.stage} resolved`}</strong></div><Metric label="Company health" value={`${state.companyHealth}%`} tone={state.companyHealth < 50 ? 'danger' : 'safe'} /><Metric label={`Threat / ${state.threatState}`} value={`${state.threatScore}%`} tone={state.threatScore >= 60 ? 'danger' : 'warn'} /></header><main className="report-page"><p className="eyebrow">Operational debrief / {response.status}</p><h1>{contained ? 'Incident contained.' : 'Campaign pressure increased.'}</h1><p className="report-lede">{contained ? 'Your response disrupted this stage of the campaign.' : 'The response left an opening for the campaign to continue.'}</p><div className="impact-row"><div><span>Company health change</span><strong>{response.healthDelta > 0 ? '+' : ''}{response.healthDelta}%</strong></div><div><span>Threat momentum change</span><strong>{response.threatDelta > 0 ? '+' : ''}{response.threatDelta}%</strong></div><div><span>Evidence that mattered</span><strong>{scenario.tags[0]}</strong></div></div><section className="report-copy"><div><p className="eyebrow">Why this mattered</p><p>{scenario.explanation}</p></div><div><p className="eyebrow">Safest real-world action</p><p>{scenario.safeAction}</p></div></section><button className="primary-button next-button" type="button" onClick={onContinue}>{state.currentIncidentIndex >= northstarCampaign.incidents.length ? 'View campaign result' : 'Return to queue'} <span aria-hidden="true">→</span></button></main></div> }
-function CampaignSummary({ state, onReplay }: { state: CampaignState; onReplay: () => void }) { const summary = getCampaignSummary(state); return <div className="app-shell"><header className="topbar"><a className="wordmark" href="/" aria-label="PhishShield home"><span className="wordmark-mark" aria-hidden="true">PS</span><span>PhishShield</span></a><span className="status-label"><span aria-hidden="true" /> Campaign closed</span></header><main className="summary-page"><p className="eyebrow">Northstar Systems / campaign result</p><h1>{summary.outcome === 'won' ? 'Operations held.' : 'The campaign broke through.'}</h1><p className="report-lede">{summary.outcome === 'won' ? 'You contained the final incident and kept the campaign below breach level.' : 'Review where the campaign gained momentum, then replay to practise the weak point.'}</p><div className="summary-grid"><Metric label="Company health" value={`${summary.companyHealth}%`} tone={summary.companyHealth < 50 ? 'danger' : 'safe'} /><Metric label="Final threat" value={`${summary.threatScore}%`} tone={summary.threatScore >= 60 ? 'danger' : 'warn'} /><Metric label="Incidents contained" value={`${summary.incidentsContained}`} tone="safe" /><Metric label="Response accuracy" value={`${summary.responseAccuracy}%`} tone="safe" /></div><section className="summary-lessons"><p className="eyebrow">Defender notes</p><h2>Every decision leaves a trace.</h2><p>Strong phishing defence combines evidence, context, and verification. A familiar name is not identity, urgency is not authority, and a safe response protects the wider company.</p></section><button className="primary-button next-button" type="button" onClick={onReplay}>Replay campaign <span aria-hidden="true">↗</span></button></main></div> }
-
-export default App
+function Header({ state }: { state: OpsState }) { return <header className="ops-header"><Brand /><div className="shift-live"><i />LIVE SHIFT <span>07 / NORTHSTAR</span></div><div className="health"><small>COMPANY HEALTH</small><strong>{state.companyHealth}%</strong><span><i style={{ width: `${state.companyHealth}%` }} /></span></div><div className="score"><small>SCORE</small><strong>{state.score.toLocaleString()}</strong></div><div className={`countdown ${state.remainingSeconds <= 15 ? 'urgent' : ''}`} role="timer" aria-label={state.mode === 'untimed' ? 'Decision countdown disabled' : `Decision countdown ${state.remainingSeconds} seconds`}><small>DECISION WINDOW</small><strong>{state.mode === 'untimed' ? 'UNTIMED' : `00:${String(state.remainingSeconds).padStart(2, '0')}`}</strong></div></header> }
+function PanelHead({ eyebrow, title, meta }: { eyebrow: string; title: string; meta: string }) { return <header className="panel-head"><div><small>{eyebrow}</small><h2>{title}</h2></div><span>{meta}</span></header> }
+function Spark({ points, tone }: { points: number[]; tone: string }) { const max = Math.max(...points, 1); return <svg className={`spark ${tone}`} viewBox="0 0 100 42" preserveAspectRatio="none"><path d="M0 39H100" /><polyline points={points.map((point, i) => `${i * 20},${38 - point / max * 32}`).join(' ')} /></svg> }
+function Review({ state, next }: { state: OpsState; next: () => void }) { const incident = incidents[state.incidentIndex], result = state.resolvedIncidents.at(-1)!; return <main className="review-screen"><Brand /><section><p className="kicker">INCIDENT 0{state.incidentIndex + 1} / CLOSED</p><div className={`outcome ${result.outcome}`}>{result.outcome.toUpperCase()}</div><h1>{incident.title}</h1><p className="root-cause">ROOT CAUSE <strong>{incident.rootCause.replaceAll('-', ' ')}</strong></p><p className="review-copy">{incident.review}</p><div className="review-grid"><div><small>ACTION</small><strong>{incident.actions.find((item) => item.id === result.action)?.label ?? 'No response'}</strong><p>{result.consequence}</p></div><div><small>COMPANY HEALTH</small><strong>{result.healthDelta > 0 ? '+' : ''}{result.healthDelta}</strong><p>{state.companyHealth}% remaining</p></div><div><small>SCORE</small><strong>{result.scoreDelta > 0 ? '+' : ''}{result.scoreDelta}</strong><p>Evidence bonus +{result.evidenceBonus}</p></div></div><button className="launch" onClick={next}>{state.incidentIndex === 2 ? 'Close shift' : 'Continue shift'} <span>→</span></button></section></main> }
+function Summary({ state, replay }: { state: OpsState; replay: () => void }) { return <main className="review-screen summary"><Brand /><section><p className="kicker">SHIFT 07 / COMPLETE</p><h1>Northstar remained <span>operational.</span></h1><p className="review-copy">Three signals, three different causes. Strong operations work separates customer demand, software failure, and malicious activity before acting.</p><div className="review-grid"><div><small>FINAL HEALTH</small><strong>{state.companyHealth}%</strong></div><div><small>FINAL SCORE</small><strong>{state.score.toLocaleString()}</strong></div><div><small>INCIDENTS</small><strong>{state.resolvedIncidents.length}/3</strong></div></div><ol className="shift-results">{state.resolvedIncidents.map((result, i) => <li key={result.incidentId}><span>0{i + 1}</span><strong>{incidents[i].title}</strong><em>{result.outcome}</em></li>)}</ol><button className="launch" onClick={replay}>Replay shift <span>↻</span></button></section></main> }

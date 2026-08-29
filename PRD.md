@@ -4,9 +4,13 @@
 
 The legacy findings in this section were verified from repository source and history reviewed on 2026-08-26. Proposed rebuild behavior is described separately as requirements.
 
-PhishShield is currently a small, fixed-size Pygame prototype. Its primary loop is a network-defense simulation driven by attack damage and defense purchases, while the learning objective of recognizing phishing is represented by one hard-coded email and a few generic tips. The repository does not yet provide a browser experience, a curated scenario curriculum, meaningful feedback, or evidence that its claimed AI behavior uses a model.
+PhishShield began as a small, fixed-size Pygame prototype. The browser product is now an approved hybrid SOC and DevOps operations game. The earlier phishing-only classification campaign is superseded: phishing is one possible initial-access path alongside benign load, deployment failure, outages, configuration errors, suspicious authentication, endpoint compromise, and malicious traffic.
 
-The product should become a focused cyber-awareness game that gives a learner repeated, realistic decisions about suspicious communications and explains the evidence behind each decision. The game is an educational exercise, not a detector that promises to protect a real inbox.
+The player operates a fictional company by monitoring a live dashboard, correlating infrastructure and security evidence, taking an operational action, and observing consequences. Alert severity must never reveal root cause. Incidents must be logically solvable, include normal activity and false-positive pressure, and penalize both delayed containment and unnecessary disruption.
+
+## Current Vertical Slice
+
+The approved review gate is a replayable three-incident shift: a legitimate customer traffic surge best handled by scaling capacity; a configuration-breaking payment deployment best handled by rollback; and a phishing-led finance endpoint compromise best handled first by endpoint isolation. The active loop is `monitor -> investigate -> diagnose -> respond -> observe consequences -> adapt`. The interface does not ask the player to classify an alert or expose its root cause before resolution.
 
 ## Target Users
 
